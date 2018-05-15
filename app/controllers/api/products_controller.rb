@@ -15,7 +15,7 @@ class Api::ProductsController < ApplicationController
     @product.save
     render 'show.json.jbuilder'
   end
-  
+
   def show
     product_id = params[:id]
     @product = Product.find(product_id)
@@ -38,7 +38,7 @@ class Api::ProductsController < ApplicationController
   def destroy
     product_id = params[:id]
     @product = Product.find(product_id)
-    product.destroy
+    @product.destroy
     render json: {message: "Product successfully destroyed."}
   end
 end

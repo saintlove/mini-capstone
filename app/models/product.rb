@@ -1,6 +1,10 @@
 class Product < ApplicationRecord
+  belongs_to :supplier
+  has_many :images
+
+
   def is_discounted?
-    if price < 10 # price is a method!not a local variable 
+    price < 10 # price is a method!not a local variable 
   end
 
   def tax
@@ -10,6 +14,4 @@ class Product < ApplicationRecord
   def total
     price + tax
   end
-end
-
 end

@@ -1,4 +1,5 @@
 class Api::ProductsController < ApplicationController
+  before_action :authenticate_admin, only:[:create, :update, :destroy]
   def index
     @products = Product.all
 
@@ -18,6 +19,12 @@ class Api::ProductsController < ApplicationController
       @products = @products.order(:id => :asc)
     end
 
+    category_name = params[:category]
+      if category_name
+        category = Category.find_by(name: category_name)
+        @products = category.products
+       end
+
     render 'index.json.jbuilder'
   end
 
@@ -31,13 +38,17 @@ class Api::ProductsController < ApplicationController
     @product = Product.new(
                            name: params[:name],
                            price: params[:price],
-                           description: params[:description],
-                           supplier_id: params[:supplier_id]
-                          )
+                            description: params[:description],
+                            supplier_id: params[:supplier_id]
+                           )
 
-    @product.save
-    render 'show.json.jbuilder'
+    if @product.save
+       render 'show.json.jbuilder'
+    else
+      render json: {errors: @product.errors.full_messages}, status: :unprocessable_entity
+    end
   end
+ 
 
   def update
     product_id = params[:id]
@@ -47,10 +58,13 @@ class Api::ProductsController < ApplicationController
     @product.price = params[:price] || @product.price
     @product.description = params[:description] || @product.description
     @product.supplier_id = params[:supplier_id] || @product.supplier_id
-    
-    @product.save
-    render 'show.json.jbuilder'
-  end
+      
+      if @product.save
+        render 'show.json.jbuilder'
+      else
+        render json: {errors: @product.errors.full_messages}, status: :unprocessable_entity
+      end
+    end
 
   def destroy
     product_id = params[:id]
@@ -59,4 +73,5 @@ class Api::ProductsController < ApplicationController
     render json: {message: "Product successfully destroyed"}
   end
 end
+
 
